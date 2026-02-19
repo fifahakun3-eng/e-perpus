@@ -1,0 +1,4 @@
+Akun Demo
+Admin — admin@perpustakaan.com / admin123
+Petugas — petugas@perpustakaan.com / petugas123
+Anggota — anggota@perpustakaan.com / anggota123

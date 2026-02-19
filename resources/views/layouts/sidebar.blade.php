@@ -1,87 +1,48 @@
-<aside class="left-sidebar">
-    <!-- Sidebar scroll-->
-    <div>
-        <div class="brand-logo d-flex align-items-center justify-content-between">
-            <!-- <a href="./index.html" class="text-nowrap logo-img">
-        <img src="../assets/images/logos/logo.svg" alt="" /> -->
-            </a>
-            <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
-                <i class="ti ti-x fs-6"></i>
-            </div>
-        </div>
-        <!-- Sidebar navigation-->
-        <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
-            <ul id="sidebarnav">
-                <li class="nav-small-cap">
-                    <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-                    <span class="hide-menu">Home</span>
-                </li>
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{ route('anggota.index') }}" aria-expanded="false">
-                        <i class="ti ti-atom"></i>
-                        <span class="hide-menu">Data Anggota</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{ route('buku.index') }}" aria-expanded="false">
-                        <i class="ti ti-atom"></i>
-                        <span class="hide-menu">Data Buku</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a class="sidebar-link justify-content-between" href="{{ route('pengunjung.index') }}"
-                        aria-expanded="false">
-                        <div class="d-flex align-items-center gap-3">
-                            <span class="d-flex">
-                                <i class="ti ti-aperture"></i>
-                            </span>
-                            <span class="hide-menu">Daftar Pengunjung</span>
-                        </div>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a class="sidebar-link justify-content-between" href="{{ route('peminjaman.index') }}"
-                        aria-expanded="false">
-                        <div class="d-flex align-items-center gap-3">
-                            <span class="d-flex">
-                                <i class="ti ti-shopping-cart"></i>
-                            </span>
-                            <span class="hide-menu">Data Peminjaman</span>
-                        </div>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{ route('pengembalian.index') }}" aria-expanded="false">
-                        <i class="ti ti-atom"></i>
-                        <span class="hide-menu">Data Pengembalian</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{ route('informasi.index') }}" aria-expanded="false">
-                        <i class="ti ti-atom"></i>
-                        <span class="hide-menu">Informasi</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{ route('laporan.index') }}" aria-expanded="false">
-                        <i class="ti ti-atom"></i>
-                        <span class="hide-menu">Laporan</span>
-                    </a>
-                </li>
-                </a>
-                </li>
-                <li class="sidebar-item">
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="./index.html" aria-expanded="false">
-                        <i class="ti ti-atom"></i>
-                        <span class="hide-menu">Data Denda</span>
-                    </a>
-                </li>
-        </nav>
-        <!-- End Sidebar navigation -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon"><i class="bi bi-book-half"></i></div>
+        <div class="logo-text">E-<span>Perpus</span></div>
     </div>
-    <!-- End Sidebar scroll-->
+
+    <nav class="sidebar-menu">
+        <div class="menu-label">Menu Utama</div>
+
+        <a href="#" class="menu-item {{ request()->is('/') ? 'active' : '' }}">
+            <i class="bi bi-grid-fill"></i> Dashboard
+        </a>
+        <a href="{{ route('anggota.index') }}" class="menu-item {{ request()->routeIs('anggota*') ? 'active' : '' }}">
+            <i class="bi bi-people-fill"></i> Data Anggota
+        </a>
+        <a href="{{ route('buku.index') }}" class="menu-item {{ request()->routeIs('buku*') ? 'active' : '' }}">
+            <i class="bi bi-book-fill"></i> Data Buku
+        </a>
+
+        <div class="menu-label">Transaksi</div>
+
+        <a href="{{ route('pengunjung.index') }}"
+            class="menu-item {{ request()->routeIs('pengunjung*') ? 'active' : '' }}">
+            <i class="bi bi-person-badge-fill"></i> Pengunjung
+        </a>
+        <a href="{{ route('peminjaman.index') }}"
+            class="menu-item {{ request()->routeIs('peminjaman*') ? 'active' : '' }}">
+            <i class="bi bi-arrow-left-right"></i> Peminjaman
+        </a>
+        <a href="{{ route('pengembalian.index') }}"
+            class="menu-item {{ request()->routeIs('pengembalian*') ? 'active' : '' }}">
+            <i class="bi bi-arrow-return-left"></i> Pengembalian
+        </a>
+        <a href="#" class="menu-item">
+            <i class="bi bi-cash-stack"></i> Data Denda
+        </a>
+
+        <div class="menu-label">Lainnya</div>
+
+        <a href="{{ route('informasi.index') }}"
+            class="menu-item {{ request()->routeIs('informasi*') ? 'active' : '' }}">
+            <i class="bi bi-megaphone-fill"></i> Informasi
+        </a>
+        <a href="{{ route('laporan.index') }}" class="menu-item {{ request()->routeIs('laporan*') ? 'active' : '' }}">
+            <i class="bi bi-bar-chart-fill"></i> Laporan
+        </a>
+    </nav>
 </aside>
