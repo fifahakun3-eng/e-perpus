@@ -9,6 +9,8 @@ class Buku extends Model
 {
     use HasFactory;
 
+    protected $table = 'bukus'; // penting karena nama tabel bukus
+
     protected $fillable = [
         'judul',
         'penulis',
@@ -22,4 +24,10 @@ class Buku extends Model
         'deskripsi',
         'cover'
     ];
+
+    // Relasi ke peminjaman
+    public function peminjaman()
+    {
+        return $this->hasMany(Peminjaman::class, 'buku_id');
+    }
 }

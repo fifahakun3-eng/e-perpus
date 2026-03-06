@@ -7,7 +7,7 @@
     <nav class="sidebar-menu">
         <div class="menu-label">Menu Utama</div>
 
-        <a href="#" class="menu-item {{ request()->is('/') ? 'active' : '' }}">
+        <a href="{{ route('dashboard') }}" class="menu-item {{ request()->is('/') ? 'active' : '' }}">
             <i class="bi bi-grid-fill"></i> Dashboard
         </a>
         <a href="{{ route('anggota.index') }}" class="menu-item {{ request()->routeIs('anggota*') ? 'active' : '' }}">

@@ -5,17 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Anggota extends Model
+class Pengunjung extends Model
 {
     use HasFactory;
 
-    protected $table = 'anggota';
+    protected $table = 'pengunjung';
 
     protected $fillable = [
         'nama',
-        'nis',
-        'kelas',
-        'no_telp',
-        'alamat',
+        'tanggal',
+        'keperluan',
     ];
 }
