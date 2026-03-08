@@ -2,94 +2,54 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pengembalian;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class DendaController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Tampilkan semua pengembalian yang punya denda (total_denda > 0)
      */
     public function index()
     {
-        return view('pages.admin.denda.index');
+        $dendas = Pengembalian::with(['peminjaman.anggota', 'peminjaman.buku'])
+            ->where('total_denda', '>', 0)
+            ->latest()
+            ->paginate(15);
+
+        $totalDenda     = Pengembalian::where('total_denda', '>', 0)->sum('total_denda');
+        $belumLunas     = Pengembalian::where('total_denda', '>', 0)->where('status_bayar', 'belum_lunas')->sum('total_denda');
+        $sudahLunas     = Pengembalian::where('total_denda', '>', 0)->where('status_bayar', 'lunas')->count();
+        $totalTransaksi = Pengembalian::where('total_denda', '>', 0)->count();
+
+        return view('pages.admin.denda.index', compact(
+            'dendas', 'totalDenda', 'belumLunas', 'sudahLunas', 'totalTransaksi'
+        ));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Tandai denda lunas
      */
-    public function create()
+    public function bayar($id)
     {
-        return view('pages.denda.create');
-    }
+        $p = Pengembalian::with('peminjaman.anggota')->findOrFail($id);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'anggota_id' => 'required|exists:users,id',
-            'jumlah_denda' => 'required|integer|min:0',
-            'tanggal_bayar' => 'nullable|date',
-            'status' => 'required|in:belum,lunas',
-            'keterangan' => 'required|string'
+        if ($p->total_denda <= 0) {
+            return back()->with('error', 'Data ini tidak memiliki denda.');
+        }
+        if ($p->status_bayar === 'lunas') {
+            return back()->with('error', 'Denda ini sudah lunas.');
+        }
+
+        $p->update([
+            'status_bayar'  => 'lunas',
+            'tanggal_bayar' => Carbon::today(),
         ]);
 
-        // Logic untuk menyimpan data denda
-        // Denda::create($validated);
-
-        return redirect()->route('denda.index')
-            ->with('success', 'Data denda berhasil ditambahkan');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        return view('pages.denda.show', compact('id'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        return view('pages.denda.edit', compact('id'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        $validated = $request->validate([
-            'anggota_id' => 'required|exists:users,id',
-            'jumlah_denda' => 'required|integer|min:0',
-            'tanggal_bayar' => 'nullable|date',
-            'status' => 'required|in:belum,lunas',
-            'keterangan' => 'required|string'
-        ]);
-
-        // Logic untuk update data denda
-        // $denda = Denda::findOrFail($id);
-        // $denda->update($validated);
-
-        return redirect()->route('denda.index')
-            ->with('success', 'Data denda berhasil diupdate');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        // Logic untuk hapus data denda
-        // $denda = Denda::findOrFail($id);
-        // $denda->delete();
-
-        return redirect()->route('denda.index')
-            ->with('success', 'Data denda berhasil dihapus');
+        return back()->with('success',
+            'Denda Rp ' . number_format($p->total_denda, 0, ',', '.') .
+            ' atas nama ' . $p->peminjaman->anggota->nama . ' berhasil ditandai lunas.'
+        );
     }
 }
-?>

@@ -31,7 +31,7 @@
             class="menu-item {{ request()->routeIs('pengembalian*') ? 'active' : '' }}">
             <i class="bi bi-arrow-return-left"></i> Pengembalian
         </a>
-        <a href="#" class="menu-item">
+        <a href="{{ route("denda.index") }}" class="menu-item">
             <i class="bi bi-cash-stack"></i> Data Denda
         </a>
 
