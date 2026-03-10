@@ -74,6 +74,67 @@ body { background:var(--paper); font-family:'DM Sans',sans-serif; color:var(--in
 .btn-submit { display:inline-flex; align-items:center; gap:9px; padding:13px 28px; background:var(--ink); color:#fff; font-family:'DM Sans',sans-serif; font-size:14.5px; font-weight:500; border:none; border-radius:9px; cursor:pointer; transition:background .2s, transform .15s, box-shadow .2s; }
 .btn-submit:hover { background:var(--amber); color:var(--ink); box-shadow:0 6px 20px rgba(200,134,10,.28); transform:translateY(-1px); }
 .btn-submit svg { width:17px; height:17px; }
+
+/* Modal Search */
+.modal-content { border:none; border-radius:16px; overflow:hidden; }
+.modal-header { padding:20px 24px; border-bottom:1px solid var(--warm-gray); background:var(--paper); }
+.modal-title { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:var(--ink); margin:0; }
+.modal-body { padding:24px; }
+.search-box {
+  display:flex; align-items:center; gap:10px;
+  padding:12px 16px; border:1.5px solid var(--border); border-radius:10px;
+  background:#fff; margin-bottom:20px;
+}
+.search-box:focus-within { border-color:var(--amber); box-shadow:0 0 0 3px rgba(200,134,10,.12); }
+.search-box svg { width:18px; height:18px; color:var(--text-muted); }
+.search-box input {
+  border:none; outline:none; width:100%;
+  font-family:'DM Sans',sans-serif; font-size:14.5px;
+}
+.list-group-item {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:14px 16px; border:1px solid var(--warm-gray);
+  margin-bottom:8px; border-radius:10px; transition:border-color .2s;
+}
+.list-group-item:hover { border-color:var(--amber); background:var(--amber-bg); }
+.list-group-item .info { flex:1; }
+.list-group-item .title { font-weight:600; font-size:15px; color:var(--ink); margin-bottom:4px; }
+.list-group-item .sub { font-size:13px; color:var(--text-muted); }
+.btn-select {
+  padding:8px 16px; background:var(--ink); color:#fff;
+  border:none; border-radius:8px; font-size:13px; font-weight:500; cursor:pointer;
+  transition:background .2s;
+}
+.btn-select:hover { background:var(--amber); color:var(--ink); }
+.btn-select:disabled { background:var(--warm-gray); color:var(--text-muted); cursor:not-allowed; }
+
+/* Select Trigger */
+.field-trigger {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 14px; border:1.5px solid var(--border); border-radius:10px;
+  background:var(--paper); cursor:pointer; transition:all .2s;
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.02);
+}
+.field-trigger:hover { border-color:var(--amber); background:#fff; box-shadow:0 4px 12px var(--shadow); transform:translateY(-1px); }
+.field-trigger.is-invalid { border-color:var(--red); background:#fdf3f2; }
+.field-trigger-left { display:flex; align-items:center; gap:14px; }
+.field-trigger-icon {
+  width:40px; height:40px; border-radius:8px;
+  background:#fff; color:var(--text-muted); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+}
+.field-trigger-icon svg { width:20px; height:20px; }
+.field-trigger:hover .field-trigger-icon { color:var(--amber); border-color:#f0d080; }
+.field-trigger-text { display:flex; flex-direction:column; }
+.field-trigger-lbl { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); margin-bottom:2px; }
+.field-trigger-val { font-size:15px; font-weight:600; color:var(--ink); }
+.field-trigger-val.empty { color:var(--text-muted); font-weight:400; font-style:italic; }
+.field-trigger-btn {
+  padding:8px 16px; border-radius:8px; background:#fff; color:var(--ink); border:1.5px solid var(--border);
+  font-size:13px; font-weight:500; display:flex; align-items:center; gap:6px; transition:all .2s;
+}
+.field-trigger:hover .field-trigger-btn { background:var(--ink); color:#fff; border-color:var(--ink); }
+.field-trigger-btn svg { width:14px; height:14px; }
 </style>
 
 <div class="pm-wrap">
@@ -118,14 +179,23 @@ body { background:var(--paper); font-family:'DM Sans',sans-serif; color:var(--in
       </div>
 
       <div class="field">
-        <label class="field-label" for="anggota_id">Anggota <span class="req">*</span></label>
-        <div class="sel-wrap">
-          <select id="anggota_id" name="anggota_id" class="{{ $errors->has('anggota_id') ? 'is-invalid' : '' }}" required>
-            <option value="" disabled {{ old('anggota_id') ? '' : 'selected' }}>— Pilih anggota —</option>
-            @foreach($anggotas as $a)
-              <option value="{{ $a->id }}" {{ old('anggota_id') == $a->id ? 'selected' : '' }}>{{ $a->nama }}</option>
-            @endforeach
-          </select>
+        <label class="field-label">Anggota <span class="req">*</span></label>
+        <div class="field-trigger {{ $errors->has('anggota_id') ? 'is-invalid' : '' }}" data-bs-toggle="modal" data-bs-target="#modalAnggota">
+          <input type="hidden" id="anggota_id" name="anggota_id" value="{{ old('anggota_id') }}">
+          <input type="hidden" id="anggota_name" name="anggota_name" value="{{ old('anggota_name') }}">
+          <div class="field-trigger-left">
+            <div class="field-trigger-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="field-trigger-text">
+              <span class="field-trigger-lbl">Peminjam</span>
+              <span class="field-trigger-val empty" id="displayAnggota">Belum ada anggota dipilih</span>
+            </div>
+          </div>
+          <div class="field-trigger-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Cari
+          </div>
         </div>
         @error('anggota_id') <p class="field-err">{{ $message }}</p> @enderror
       </div>
@@ -137,18 +207,24 @@ body { background:var(--paper); font-family:'DM Sans',sans-serif; color:var(--in
       </div>
 
       <div class="field">
-        <label class="field-label" for="buku_id">Judul Buku <span class="req">*</span></label>
-        <div class="sel-wrap">
-          <select id="buku_id" name="buku_id" class="{{ $errors->has('buku_id') ? 'is-invalid' : '' }}" required>
-            <option value="" disabled {{ old('buku_id') ? '' : 'selected' }}>— Pilih buku —</option>
-            @foreach($bukus as $b)
-              <option value="{{ $b->id }}" {{ old('buku_id') == $b->id ? 'selected' : '' }} {{ $b->stok < 1 ? 'disabled' : '' }}>
-                {{ $b->judul }}{{ $b->stok > 0 ? ' · Stok: '.$b->stok : ' (Habis)' }}
-              </option>
-            @endforeach
-          </select>
+        <label class="field-label">Judul Buku <span class="req">*</span></label>
+        <div class="field-trigger {{ $errors->has('buku_id') ? 'is-invalid' : '' }}" data-bs-toggle="modal" data-bs-target="#modalBuku">
+          <input type="hidden" id="buku_id" name="buku_id" value="{{ old('buku_id') }}">
+          <input type="hidden" id="buku_title" name="buku_title" value="{{ old('buku_title') }}">
+          <div class="field-trigger-left">
+            <div class="field-trigger-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            </div>
+            <div class="field-trigger-text">
+              <span class="field-trigger-lbl">Buku</span>
+              <span class="field-trigger-val empty" id="displayBuku">Belum ada buku dipilih</span>
+            </div>
+          </div>
+          <div class="field-trigger-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Cari
+          </div>
         </div>
-        <p class="field-hint">Buku berstok 0 tidak dapat dipilih.</p>
         @error('buku_id') <p class="field-err">{{ $message }}</p> @enderror
       </div>
 
@@ -186,13 +262,138 @@ body { background:var(--paper); font-family:'DM Sans',sans-serif; color:var(--in
   </div>
 </div>
 
+{{-- Modal Pilih Anggota --}}
+<div class="modal fade" id="modalAnggota" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header d-flex justify-content-between align-items-center">
+        <h5 class="modal-title">Pilih Anggota</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchAnggota" placeholder="Cari nama anggota...">
+        </div>
+        <div class="list-group list-anggota">
+          @foreach($anggotas as $a)
+            <div class="list-group-item item-anggota" data-name="{{ strtolower($a->nama) }}">
+              <div class="info">
+                <div class="title">{{ $a->nama }}</div>
+                <div class="sub">No. Telp: {{ $a->no_telp ?? '-' }}</div>
+              </div>
+              <button type="button" class="btn-select" onclick="selectAnggota({{ $a->id }}, '{{ addslashes($a->nama) }}')" data-bs-dismiss="modal">Pilih</button>
+            </div>
+          @endforeach
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{-- Modal Pilih Buku --}}
+<div class="modal fade" id="modalBuku" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header d-flex justify-content-between align-items-center">
+        <h5 class="modal-title">Pilih Buku</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchBuku" placeholder="Cari judul atau penulis buku...">
+        </div>
+        <div class="list-group list-buku">
+          @foreach($bukus as $b)
+            <div class="list-group-item item-buku" data-title="{{ strtolower($b->judul) }}" data-author="{{ strtolower($b->penulis ?? '') }}">
+              <div class="info">
+                <div class="title">{{ $b->judul }}</div>
+                <div class="sub">
+                  {{ $b->penulis ?? 'Tanpa Penulis' }} &middot; 
+                  <span style="color:{{ $b->stok > 0 ? 'var(--green)' : 'var(--red)' }}">Stok: {{ $b->stok }}</span>
+                </div>
+              </div>
+              <button type="button" class="btn-select" {{ $b->stok < 1 ? 'disabled' : '' }} 
+                      onclick="selectBuku({{ $b->id }}, '{{ addslashes($b->judul) }}')" data-bs-dismiss="modal">
+                {{ $b->stok > 0 ? 'Pilih' : 'Habis' }}
+              </button>
+            </div>
+          @endforeach
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
+  // Date validation
   const tp = document.getElementById('tanggal_pinjam');
   const tk = document.getElementById('tanggal_kembali');
   function syncMin(){
     if(tp.value){ tk.min = tp.value; if(tk.value && tk.value < tp.value) tk.value=''; }
   }
   tp.addEventListener('change', syncMin); syncMin();
+
+  // Search Anggota
+  document.getElementById('searchAnggota').addEventListener('input', function(e) {
+    const q = e.target.value.toLowerCase();
+    document.querySelectorAll('.item-anggota').forEach(item => {
+      if (item.dataset.name.includes(q)) {
+        item.style.display = 'flex';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  });
+
+  // Search Buku
+  document.getElementById('searchBuku').addEventListener('input', function(e) {
+    const q = e.target.value.toLowerCase();
+    document.querySelectorAll('.item-buku').forEach(item => {
+      if (item.dataset.title.includes(q) || item.dataset.author.includes(q)) {
+        item.style.display = 'flex';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  });
+
+  // Select logic
+  function selectAnggota(id, name) {
+    document.getElementById('anggota_id').value = id;
+    document.getElementById('anggota_name').value = name;
+    
+    const display = document.getElementById('displayAnggota');
+    display.textContent = name;
+    display.classList.remove('empty');
+  }
+  
+  function selectBuku(id, title) {
+    document.getElementById('buku_id').value = id;
+    document.getElementById('buku_title').value = title;
+    
+    const display = document.getElementById('displayBuku');
+    display.textContent = title;
+    display.classList.remove('empty');
+  }
+  
+  // Re-fill existing names (for validation error re-renders)
+  document.addEventListener('DOMContentLoaded', () => {
+    // Check if Anggota has old value
+    const oldAnggotaId = "{{ old('anggota_id') }}";
+    if(oldAnggotaId) {
+       // Find the item
+       const btn = document.querySelector(`.item-anggota button[onclick*="selectAnggota(${oldAnggotaId}"]`);
+       if(btn) btn.click();
+    }
+    
+    const oldBukuId = "{{ old('buku_id') }}";
+    if(oldBukuId) {
+       const btn = document.querySelector(`.item-buku button[onclick*="selectBuku(${oldBukuId}"]`);
+       if(btn) btn.click();
+    }
+  });
 </script>
 
 @endsection

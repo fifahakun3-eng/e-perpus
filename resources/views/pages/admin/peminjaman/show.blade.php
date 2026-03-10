@@ -44,8 +44,8 @@ body { background:var(--paper); font-family:'DM Sans',sans-serif; color:var(--in
 /* Status hero badge */
 @php
   $late = $peminjaman->status === 'dipinjam' && $peminjaman->tanggal_kembali < now()->toDateString();
-  $statusKey  = $late ? 'terlambat' : $peminjaman->status;
-  $statusText = $late ? 'Terlambat' : ucfirst(str_replace('_',' ',$peminjaman->status));
+  $statusKey  = $late ? 'terlambat' : ($peminjaman->status === 'kembali' ? 'dikembalikan' : $peminjaman->status);
+  $statusText = $late ? 'Terlambat' : ($peminjaman->status === 'kembali' ? 'Dikembalikan' : ucfirst(str_replace('_',' ',$peminjaman->status)));
 @endphp
 
 .status-hero {
@@ -85,11 +85,11 @@ body { background:var(--paper); font-family:'DM Sans',sans-serif; color:var(--in
 .timeline { display:flex; align-items:center; gap:0; margin-top:16px; }
 .tl-node { text-align:center; flex-shrink:0; }
 .tl-dot  { width:12px; height:12px; border-radius:50%; background:var(--amber); margin:0 auto 6px; }
-.tl-dot.end { background: @if($late) var(--red) @elseif($peminjaman->status=='dikembalikan') var(--green) @else var(--border) @endif; }
+.tl-dot.end { background: @if($late) var(--red) @elseif($statusKey=='dikembalikan') var(--green) @else var(--border) @endif; }
 .tl-date { font-size:12px; font-weight:500; color:var(--ink); }
 .tl-lbl  { font-size:11px; color:var(--text-muted); }
 .tl-line { flex:1; height:2px; background:var(--warm-gray); position:relative; top:-9px; }
-.tl-line-inner { height:100%; background:var(--amber); width:{{ $peminjaman->status=='dikembalikan' ? '100' : '50' }}%; }
+.tl-line-inner { height:100%; background:var(--amber); width:{{ $statusKey=='dikembalikan' ? '100' : '50' }}%; }
 
 /* Delete form */
 .danger-zone { margin-top:32px; padding:20px 22px; background:#fff; border:1px solid #f5c0bb; border-radius:13px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
@@ -121,8 +121,8 @@ body { background:var(--paper); font-family:'DM Sans',sans-serif; color:var(--in
   {{-- Status hero --}}
   @php
     $late = $peminjaman->status === 'dipinjam' && $peminjaman->tanggal_kembali < now()->toDateString();
-    $statusKey  = $late ? 'terlambat' : $peminjaman->status;
-    $statusText = $late ? 'Terlambat' : ucfirst(str_replace('_',' ',$peminjaman->status));
+    $statusKey  = $late ? 'terlambat' : ($peminjaman->status === 'kembali' ? 'dikembalikan' : $peminjaman->status);
+    $statusText = $late ? 'Terlambat' : ($peminjaman->status === 'kembali' ? 'Dikembalikan' : ucfirst(str_replace('_',' ',$peminjaman->status)));
     $pinjam  = \Carbon\Carbon::parse($peminjaman->tanggal_pinjam);
     $kembali = \Carbon\Carbon::parse($peminjaman->tanggal_kembali);
     $durasi  = $pinjam->diffInDays($kembali);

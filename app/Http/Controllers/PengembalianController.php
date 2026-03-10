@@ -54,7 +54,7 @@ class PengembalianController extends Controller
 
         $dendaKeterlambatan = $hariTerlambat * $dendaPerHari;
 
-        $dendaKondisi = match($request->kondisi_buku) {
+        $dendaKondisi = match ($request->kondisi_buku) {
             'rusak_ringan' => 20000,
             'rusak_berat'  => 50000,
             'hilang'       => 100000,
@@ -72,6 +72,7 @@ class PengembalianController extends Controller
             'total_denda'            => $totalDenda,
             'kondisi_buku'           => $request->kondisi_buku,
             'catatan'                => $request->catatan,
+            'status_bayar'           => $totalDenda > 0 ? 'belum_lunas' : 'lunas',
         ]);
 
         $peminjaman->update(['status' => 'kembali']);

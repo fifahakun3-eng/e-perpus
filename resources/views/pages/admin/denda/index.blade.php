@@ -266,6 +266,7 @@ tbody td.center { text-align:center; }
             <th>Tgl Kembali</th>
             <th>Rincian Denda</th>
             <th>Total Denda</th>
+            <th>Terbayar/Sisa</th>
             <th class="center">Status</th>
             <th class="center">Aksi</th>
           </tr>
@@ -296,12 +297,20 @@ tbody td.center { text-align:center; }
               </div>
             </td>
             <td class="td-denda">Rp {{ number_format($d->total_denda,0,',','.') }}</td>
+            <td>
+              <div class="denda-detail">
+                <span class="text-success" style="font-weight:600">Terbayar: Rp {{ number_format($d->total_dibayar,0,',','.') }}</span>
+                @if($d->sisa_denda > 0)
+                  <span class="text-danger mt-1" style="display:block">Sisa: Rp {{ number_format($d->sisa_denda,0,',','.') }}</span>
+                @endif
+              </div>
+            </td>
             <td class="center">
               @if($d->status_bayar === 'lunas')
                 <span class="badge-lunas">Lunas</span>
-                @if($d->tanggal_bayar)
+                @if($d->pembayaranDenda->isNotEmpty())
                   <div style="font-size:11.5px;color:var(--text-muted);margin-top:3px">
-                    {{ \Carbon\Carbon::parse($d->tanggal_bayar)->format('d M Y') }}
+                    {{ \Carbon\Carbon::parse($d->pembayaranDenda->last()->tanggal_bayar)->format('d M Y') }}
                   </div>
                 @endif
               @else
@@ -318,10 +327,13 @@ tbody td.center { text-align:center; }
                     {{ $d->total_denda }},
                     {{ $d->denda_keterlambatan }},
                     {{ $d->denda_kondisi }},
-                    {{ $d->hari_terlambat }}
+                    {{ $d->hari_terlambat }},
+                    {{ $d->total_dibayar }},
+                    {{ $d->sisa_denda }},
+                    {{ json_encode($d->pembayaranDenda->map(function($p) { return ['tanggal' => \Carbon\Carbon::parse($p->tanggal_bayar)->format('d M Y'), 'jumlah' => $p->jumlah_bayar, 'keterangan' => $p->keterangan]; })) }}
                   )">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                  Bayar
+                  Bayar/Detail
                 </button>
               @else
                 <div class="lunas-info">
@@ -404,19 +416,52 @@ tbody td.center { text-align:center; }
           </div>
         </div>
 
-        <div class="modal-body-pad" style="font-size:13.5px;color:var(--text-muted)">
-          Pastikan pembayaran telah diterima sebelum mengkonfirmasi. Tindakan ini tidak dapat dibatalkan.
+        {{-- Riwayat Pembayaran --}}
+        <div id="riwayatPembayaranContainer" style="display:none;">
+          <div class="modal-body-pad" style="padding-bottom:5px; border-bottom:1px solid var(--warm-gray);">
+            <div style="font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;color:var(--ink);margin-bottom:8px;">Riwayat Pembayaran (Cicilan)</div>
+            <div id="riwayatList" style="font-size:13px;color:var(--text-muted);">
+              <!-- List riwayat via JS -->
+            </div>
+          </div>
         </div>
+
+        {{-- Form Pembayaran Baru --}}
+        <form id="bayarForm" method="POST">
+          @csrf @method('PATCH')
+          <div class="modal-body-pad" style="background:#fcfcfc;">
+            <div style="font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;color:var(--ink);margin-bottom:12px;">Tambah Pembayaran Baru</div>
+            
+            <div class="mb-3">
+              <label for="jumlah_bayar" class="form-label" style="font-size:12.5px;color:var(--text-muted);font-weight:500;">Jumlah Bayar (Rp)</label>
+              <input type="number" class="form-control" id="jumlah_bayar" name="jumlah_bayar" required min="1" 
+                     style="border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;"
+                     oninput="hitungKembalian()">
+              <small id="sisaDendaHelp" class="form-text text-muted" style="font-size:11px;">Maksimal: Rp <span id="mbMaxSisa">0</span></small>
+            </div>
+
+            <div class="mb-0">
+              <label for="keterangan" class="form-label" style="font-size:12.5px;color:var(--text-muted);font-weight:500;">Keterangan (Opsional)</label>
+              <textarea class="form-control" id="keterangan" name="keterangan" rows="2" placeholder="Cth: Cicilan pertama..."
+                        style="border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;"></textarea>
+            </div>
+            
+            <div id="kembalianInfo" style="display:none; margin-top:12px; font-size:13px; color:var(--red); font-weight:500;">
+              Oversight: Jumlah bayar melebihi sisa denda.
+            </div>
+          </div>
+
+          <div class="modal-body-pad" style="font-size:13px;color:var(--text-muted);border-top:1px solid var(--warm-gray);">
+            Pastikan pembayaran telah diterima sebelum menyimpan. Tindakan ini tidak dapat dibatalkan.
+          </div>
       </div>
 
-      <div class="modal-footer">
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-        <form id="bayarForm" method="POST" style="display:inline">
-          @csrf @method('PATCH')
-          <button type="submit" class="btn-konfirmasi">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-            Konfirmasi Lunas
-          </button>
+      <div class="modal-footer d-flex justify-content-between">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="font-family:'DM Sans',sans-serif;font-weight:500;">Batal</button>
+        <button type="submit" class="btn-konfirmasi" id="btnSubmitBayar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Simpan Pembayaran
+        </button>
         </form>
       </div>
 
@@ -444,12 +489,33 @@ document.addEventListener('DOMContentLoaded', function () {
   bsModalBayar = new bootstrap.Modal(document.getElementById('modalBayar'));
 });
 
-function openBayarModal(id, anggota, buku, total, keterlambatan, kondisi, hari) {
+let globalSisaDenda = 0;
+
+function hitungKembalian() {
+  const input = document.getElementById('jumlah_bayar');
+  const msg = document.getElementById('kembalianInfo');
+  const btn = document.getElementById('btnSubmitBayar');
+  const val = parseInt(input.value) || 0;
+  
+  if (val > globalSisaDenda) {
+    msg.style.display = 'block';
+    btn.disabled = true;
+    input.style.borderColor = 'var(--red)';
+  } else {
+    msg.style.display = 'none';
+    btn.disabled = false;
+    input.style.borderColor = 'var(--border)';
+  }
+}
+
+function openBayarModal(id, anggota, buku, total, keterlambatan, kondisi, hari, terbayar, sisa, riwayatStr) {
   document.getElementById('bayarForm').action = '/denda/' + id + '/bayar';
   document.getElementById('modalBayarSub').textContent = 'ID Pengembalian #' + id;
   document.getElementById('mbAnggota').textContent     = anggota;
   document.getElementById('mbBuku').textContent        = buku;
   document.getElementById('mbHari').textContent        = hari;
+
+  globalSisaDenda = sisa;
 
   const elK = document.getElementById('mbKeterlambatan');
   elK.textContent = keterlambatan > 0 ? 'Rp ' + keterlambatan.toLocaleString('id-ID') : '—';
@@ -460,6 +526,45 @@ function openBayarModal(id, anggota, buku, total, keterlambatan, kondisi, hari) 
   elKo.className   = 'db-val ' + (kondisi > 0 ? 'red' : 'muted');
 
   document.getElementById('mbTotal').textContent = 'Rp ' + total.toLocaleString('id-ID');
+  
+  // Set the max amount to the remaining fine
+  document.getElementById('mbMaxSisa').textContent = sisa.toLocaleString('id-ID');
+  const inputBayar = document.getElementById('jumlah_bayar');
+  inputBayar.value = sisa;
+  inputBayar.max = sisa;
+  hitungKembalian(); // Reset validation state
+
+  document.getElementById('keterangan').value = '';
+
+  // Render Riwayat
+  const riwayatContainer = document.getElementById('riwayatPembayaranContainer');
+  const riwayatList = document.getElementById('riwayatList');
+  
+  let riwayat = [];
+  if (riwayatStr) {
+    riwayat = typeof riwayatStr === 'string' ? JSON.parse(riwayatStr) : riwayatStr;
+  }
+  
+  if (riwayat && riwayat.length > 0) {
+    riwayatContainer.style.display = 'block';
+    let html = `<div style="display:flex; justify-content:space-between; font-weight:500; margin-bottom:4px;">
+                  <span>Total Terbayar:</span>
+                  <span style="color:var(--green)">Rp ${terbayar.toLocaleString('id-ID')}</span>
+                </div>`;
+    html += `<ul style="margin:5px 0 0; padding-left:18px;">`;
+    riwayat.forEach(r => {
+      html += `<li><span style="display:inline-block;width:80px">${r.tanggal}</span> : <strong>Rp ${r.jumlah.toLocaleString('id-ID')}</strong> ${r.keterangan ? '— <i>'+r.keterangan+'</i>' : ''}</li>`;
+    });
+    html += `</ul>`;
+    html += `<div style="display:flex; justify-content:space-between; font-weight:600; margin-top:8px; border-top:1px dashed #ccc; padding-top:4px;">
+                <span>Sisa Denda:</span>
+                <span style="color:var(--red)">Rp ${sisa.toLocaleString('id-ID')}</span>
+              </div>`;
+    riwayatList.innerHTML = html;
+  } else {
+    riwayatContainer.style.display = 'none';
+    riwayatList.innerHTML = '';
+  }
 
   bsModalBayar.show();
 }

@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -11,8 +12,8 @@ return new class extends Migration
         Schema::table('pengembalian', function (Blueprint $table) {
             // Status pembayaran denda (default lunas jika total_denda = 0)
             $table->enum('status_bayar', ['lunas', 'belum_lunas'])
-                  ->default('belum_lunas')
-                  ->after('total_denda');
+                ->default('belum_lunas')
+                ->after('total_denda');
             $table->date('tanggal_bayar')->nullable()->after('status_bayar');
         });
 

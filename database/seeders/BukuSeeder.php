@@ -2,16 +2,259 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Buku;
 
 class BukuSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        
+        $bukus = [
+            // ── Fiksi ────────────────────────────────────────────
+            [
+                'judul'          => 'Laskar Pelangi',
+                'penulis'        => 'Andrea Hirata',
+                'penerbit'       => 'Bentang Pustaka',
+                'isbn'           => '978-979-1227-olean',
+                'tahun_terbit'   => 2005,
+                'jumlah_halaman' => 529,
+                'kategori'       => 'Fiksi',
+                'rak'            => 'A1',
+                'stok'           => 5,
+                'deskripsi'      => 'Novel tentang perjuangan anak-anak Belitung dalam menggapai mimpi di tengah keterbatasan.',
+            ],
+            [
+                'judul'          => 'Bumi Manusia',
+                'penulis'        => 'Pramoedya Ananta Toer',
+                'penerbit'       => 'Lentera Dipantara',
+                'isbn'           => '978-979-97312-3-2',
+                'tahun_terbit'   => 1980,
+                'jumlah_halaman' => 535,
+                'kategori'       => 'Fiksi',
+                'rak'            => 'A1',
+                'stok'           => 4,
+                'deskripsi'      => 'Kisah Minke, pemuda Jawa di era kolonial Belanda yang berjuang menemukan jati diri dan keadilan.',
+            ],
+            [
+                'judul'          => 'Ronggeng Dukuh Paruk',
+                'penulis'        => 'Ahmad Tohari',
+                'penerbit'       => 'Gramedia Pustaka Utama',
+                'isbn'           => '978-979-22-7653-4',
+                'tahun_terbit'   => 1982,
+                'jumlah_halaman' => 408,
+                'kategori'       => 'Fiksi',
+                'rak'            => 'A2',
+                'stok'           => 3,
+                'deskripsi'      => 'Novel tentang kehidupan seorang ronggeng di desa kecil Jawa Tengah.',
+            ],
+            [
+                'judul'          => 'Negeri 5 Menara',
+                'penulis'        => 'Ahmad Fuadi',
+                'penerbit'       => 'Gramedia Pustaka Utama',
+                'isbn'           => '978-979-22-4861-6',
+                'tahun_terbit'   => 2009,
+                'jumlah_halaman' => 423,
+                'kategori'       => 'Fiksi',
+                'rak'            => 'A2',
+                'stok'           => 6,
+                'deskripsi'      => 'Kisah enam santri yang bermimpi meraih cita-cita setinggi langit dari pesantren.',
+            ],
+            [
+                'judul'          => 'Perahu Kertas',
+                'penulis'        => 'Dewi Lestari',
+                'penerbit'       => 'Bentang Pustaka',
+                'isbn'           => '978-602-7888-33-4',
+                'tahun_terbit'   => 2009,
+                'jumlah_halaman' => 444,
+                'kategori'       => 'Fiksi',
+                'rak'            => 'A3',
+                'stok'           => 4,
+                'deskripsi'      => 'Novel romantis tentang dua anak muda yang terpisah jarak namun terhubung oleh takdir.',
+            ],
+            [
+                'judul'          => 'Ayat-Ayat Cinta',
+                'penulis'        => 'Habiburrahman El Shirazy',
+                'penerbit'       => 'Republika',
+                'isbn'           => '978-979-1102-34-6',
+                'tahun_terbit'   => 2004,
+                'jumlah_halaman' => 419,
+                'kategori'       => 'Fiksi',
+                'rak'            => 'A3',
+                'stok'           => 5,
+                'deskripsi'      => 'Novel Islami tentang mahasiswa Indonesia di Mesir yang diuji cinta dan keimanan.',
+            ],
+
+            // ── Non-Fiksi ────────────────────────────────────────
+            [
+                'judul'          => 'Sejarah Indonesia Modern',
+                'penulis'        => 'M.C. Ricklefs',
+                'penerbit'       => 'Gadjah Mada University Press',
+                'isbn'           => '978-979-420-430-6',
+                'tahun_terbit'   => 2008,
+                'jumlah_halaman' => 680,
+                'kategori'       => 'Sejarah',
+                'rak'            => 'B1',
+                'stok'           => 3,
+                'deskripsi'      => 'Buku referensi sejarah Indonesia dari abad ke-18 hingga era modern.',
+            ],
+            [
+                'judul'          => 'Jalan Menuju Kemerdekaan',
+                'penulis'        => 'Soekarno',
+                'penerbit'       => 'Media Pressindo',
+                'isbn'           => '978-979-911-234-1',
+                'tahun_terbit'   => 2016,
+                'jumlah_halaman' => 312,
+                'kategori'       => 'Sejarah',
+                'rak'            => 'B1',
+                'stok'           => 2,
+                'deskripsi'      => 'Kumpulan pidato dan tulisan Soekarno tentang perjuangan kemerdekaan Indonesia.',
+            ],
+
+            // ── Sains & Teknologi ────────────────────────────────
+            [
+                'judul'          => 'Pengantar Ilmu Komputer',
+                'penulis'        => 'Rinaldi Munir',
+                'penerbit'       => 'Informatika',
+                'isbn'           => '978-602-1514-05-4',
+                'tahun_terbit'   => 2016,
+                'jumlah_halaman' => 380,
+                'kategori'       => 'Teknologi',
+                'rak'            => 'C1',
+                'stok'           => 7,
+                'deskripsi'      => 'Buku teks pengantar ilmu komputer yang membahas konsep dasar pemrograman dan algoritma.',
+            ],
+            [
+                'judul'          => 'Algoritma dan Pemrograman',
+                'penulis'        => 'Rinaldi Munir',
+                'penerbit'       => 'Informatika',
+                'isbn'           => '978-602-1514-10-8',
+                'tahun_terbit'   => 2019,
+                'jumlah_halaman' => 456,
+                'kategori'       => 'Teknologi',
+                'rak'            => 'C1',
+                'stok'           => 5,
+                'deskripsi'      => 'Membahas konsep algoritma, struktur data, dan teknik pemrograman secara sistematis.',
+            ],
+            [
+                'judul'          => 'Fisika Dasar Jilid 1',
+                'penulis'        => 'Halliday, Resnick & Walker',
+                'penerbit'       => 'Erlangga',
+                'isbn'           => '978-979-015-421-5',
+                'tahun_terbit'   => 2010,
+                'jumlah_halaman' => 567,
+                'kategori'       => 'Sains',
+                'rak'            => 'C2',
+                'stok'           => 4,
+                'deskripsi'      => 'Buku teks fisika dasar yang membahas mekanika, termodinamika, dan gelombang.',
+            ],
+
+            // ── Bisnis & Ekonomi ─────────────────────────────────
+            [
+                'judul'          => 'Rich Dad Poor Dad',
+                'penulis'        => 'Robert T. Kiyosaki',
+                'penerbit'       => 'Gramedia Pustaka Utama',
+                'isbn'           => '978-979-22-9876-5',
+                'tahun_terbit'   => 2000,
+                'jumlah_halaman' => 335,
+                'kategori'       => 'Bisnis',
+                'rak'            => 'D1',
+                'stok'           => 6,
+                'deskripsi'      => 'Buku tentang literasi keuangan dan pola pikir orang kaya versus orang miskin.',
+            ],
+            [
+                'judul'          => 'Zero to One',
+                'penulis'        => 'Peter Thiel',
+                'penerbit'       => 'Gramedia Pustaka Utama',
+                'isbn'           => '978-979-22-1234-7',
+                'tahun_terbit'   => 2014,
+                'jumlah_halaman' => 248,
+                'kategori'       => 'Bisnis',
+                'rak'            => 'D1',
+                'stok'           => 4,
+                'deskripsi'      => 'Panduan membangun startup inovatif dan menciptakan monopoli yang bernilai.',
+            ],
+
+            // ── Pengembangan Diri ─────────────────────────────────
+            [
+                'judul'          => 'Atomic Habits',
+                'penulis'        => 'James Clear',
+                'penerbit'       => 'Gramedia Pustaka Utama',
+                'isbn'           => '978-979-22-5678-9',
+                'tahun_terbit'   => 2018,
+                'jumlah_halaman' => 320,
+                'kategori'       => 'Pengembangan Diri',
+                'rak'            => 'E1',
+                'stok'           => 8,
+                'deskripsi'      => 'Panduan membangun kebiasaan kecil yang memberikan perubahan luar biasa.',
+            ],
+            [
+                'judul'          => 'The 7 Habits of Highly Effective People',
+                'penulis'        => 'Stephen R. Covey',
+                'penerbit'       => 'Binarupa Aksara',
+                'isbn'           => '978-979-8535-10-2',
+                'tahun_terbit'   => 1989,
+                'jumlah_halaman' => 396,
+                'kategori'       => 'Pengembangan Diri',
+                'rak'            => 'E1',
+                'stok'           => 5,
+                'deskripsi'      => 'Tujuh kebiasaan yang dimiliki orang-orang yang sangat efektif dalam kehidupan dan karier.',
+            ],
+
+            // ── Pendidikan ───────────────────────────────────────
+            [
+                'judul'          => 'Psikologi Pendidikan',
+                'penulis'        => 'Syamsu Yusuf',
+                'penerbit'       => 'Remaja Rosdakarya',
+                'isbn'           => '978-979-514-892-3',
+                'tahun_terbit'   => 2011,
+                'jumlah_halaman' => 287,
+                'kategori'       => 'Pendidikan',
+                'rak'            => 'F1',
+                'stok'           => 4,
+                'deskripsi'      => 'Membahas teori dan praktik psikologi dalam konteks pendidikan di Indonesia.',
+            ],
+            [
+                'judul'          => 'Metodologi Penelitian',
+                'penulis'        => 'Sugiyono',
+                'penerbit'       => 'Alfabeta',
+                'isbn'           => '978-602-289-533-6',
+                'tahun_terbit'   => 2019,
+                'jumlah_halaman' => 334,
+                'kategori'       => 'Pendidikan',
+                'rak'            => 'F1',
+                'stok'           => 6,
+                'deskripsi'      => 'Panduan lengkap metodologi penelitian kuantitatif, kualitatif, dan kombinasi.',
+            ],
+
+            // ── Agama ────────────────────────────────────────────
+            [
+                'judul'          => 'Fikih Sunnah',
+                'penulis'        => 'Sayyid Sabiq',
+                'penerbit'       => 'Cakrawala Publishing',
+                'isbn'           => '978-602-1032-11-4',
+                'tahun_terbit'   => 2012,
+                'jumlah_halaman' => 612,
+                'kategori'       => 'Agama',
+                'rak'            => 'G1',
+                'stok'           => 3,
+                'deskripsi'      => 'Panduan fikih ibadah sehari-hari berdasarkan Al-Quran dan hadis.',
+            ],
+            [
+                'judul'          => 'Tafsir Al-Misbah',
+                'penulis'        => 'M. Quraish Shihab',
+                'penerbit'       => 'Lentera Hati',
+                'isbn'           => '978-979-9048-37-2',
+                'tahun_terbit'   => 2002,
+                'jumlah_halaman' => 745,
+                'kategori'       => 'Agama',
+                'rak'            => 'G1',
+                'stok'           => 2,
+                'deskripsi'      => 'Tafsir Al-Quran kontemporer dalam bahasa Indonesia yang mudah dipahami.',
+            ],
+        ];
+
+        foreach ($bukus as $buku) {
+            Buku::create($buku);
+        }
     }
 }

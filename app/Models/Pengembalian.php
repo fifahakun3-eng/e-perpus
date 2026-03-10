@@ -19,6 +19,8 @@ class Pengembalian extends Model
         'denda_kondisi',
         'total_denda',
         'kondisi_buku',
+        'status_bayar',
+        'tanggal_bayar',
         'catatan',
     ];
 
@@ -29,5 +31,20 @@ class Pengembalian extends Model
     public function peminjaman()
     {
         return $this->belongsTo(Peminjaman::class);
+    }
+
+    public function pembayaranDenda()
+    {
+        return $this->hasMany(PembayaranDenda::class);
+    }
+
+    public function getTotalDibayarAttribute()
+    {
+        return $this->pembayaranDenda()->sum('jumlah_bayar');
+    }
+
+    public function getSisaDendaAttribute()
+    {
+        return max(0, $this->total_denda - $this->total_dibayar);
     }
 }

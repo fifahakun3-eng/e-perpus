@@ -37,7 +37,7 @@ class PeminjamanController extends Controller
             'anggota_id'     => 'required|exists:anggota,id',
             'buku_id'        => 'required|exists:bukus,id',
             'tanggal_pinjam' => 'required|date',
-            'tanggal_kembali'=> 'required|date|after_or_equal:tanggal_pinjam',
+            'tanggal_kembali' => 'required|date|after_or_equal:tanggal_pinjam',
         ]);
 
         $buku = Buku::findOrFail($request->buku_id);
@@ -50,7 +50,7 @@ class PeminjamanController extends Controller
             'anggota_id'     => $request->anggota_id,
             'buku_id'        => $request->buku_id,
             'tanggal_pinjam' => $request->tanggal_pinjam,
-            'tanggal_kembali'=> $request->tanggal_kembali,
+            'tanggal_kembali' => $request->tanggal_kembali,
             'status'         => 'dipinjam',
         ]);
 
@@ -93,8 +93,8 @@ class PeminjamanController extends Controller
             'anggota_id'     => 'required|exists:anggota,id',
             'buku_id'        => 'required|exists:bukus,id',
             'tanggal_pinjam' => 'required|date',
-            'tanggal_kembali'=> 'required|date|after_or_equal:tanggal_pinjam',
-            'status'         => 'required|in:dipinjam,dikembalikan',
+            'tanggal_kembali' => 'required|date|after_or_equal:tanggal_pinjam',
+            'status'         => 'required|in:dipinjam,kembali',
         ]);
 
         $peminjaman  = Peminjaman::findOrFail($id);
@@ -120,14 +120,12 @@ class PeminjamanController extends Controller
             if ($newStatus === 'dipinjam') {
                 $bukuBaru->decrement('stok');
             }
-
         } else {
             // Buku sama, cek perubahan status
-            if ($oldStatus === 'dipinjam' && $newStatus === 'dikembalikan') {
+            if ($oldStatus === 'dipinjam' && $newStatus === 'kembali') {
                 // Buku dikembalikan → naikkan stok
                 $bukuBaru->increment('stok');
-
-            } elseif ($oldStatus === 'dikembalikan' && $newStatus === 'dipinjam') {
+            } elseif ($oldStatus === 'kembali' && $newStatus === 'dipinjam') {
                 // Dipinjam lagi → cek dan kurangi stok
                 if ($bukuBaru->stok <= 0) {
                     return back()->withInput()->with('error', 'Stok buku habis, tidak dapat dipinjam kembali.');
@@ -141,7 +139,7 @@ class PeminjamanController extends Controller
             'anggota_id'     => $request->anggota_id,
             'buku_id'        => $newBukuId,
             'tanggal_pinjam' => $request->tanggal_pinjam,
-            'tanggal_kembali'=> $request->tanggal_kembali,
+            'tanggal_kembali' => $request->tanggal_kembali,
             'status'         => $newStatus,
         ]);
 

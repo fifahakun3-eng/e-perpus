@@ -189,7 +189,7 @@ tbody td { padding:13px 16px; font-size:14px; color:var(--ink); vertical-align:m
   @php
     $total     = $peminjaman->count();
     $aktif     = $peminjaman->where('status','dipinjam')->count();
-    $kembali   = $peminjaman->where('status','dikembalikan')->count();
+    $kembali   = $peminjaman->where('status','kembali')->count();
     $terlambat = $peminjaman->filter(fn($p) => $p->status === 'dipinjam' && $p->tanggal_kembali < now()->toDateString())->count();
   @endphp
   <div class="pm-stats">
@@ -242,8 +242,8 @@ tbody td { padding:13px 16px; font-size:14px; color:var(--ink); vertical-align:m
         @forelse($peminjaman as $key => $p)
         @php
           $late = $p->status === 'dipinjam' && $p->tanggal_kembali < now()->toDateString();
-          $statusLabel = $late ? 'terlambat' : $p->status;
-          $statusText  = $late ? 'Terlambat' : ucfirst(str_replace('_',' ',$p->status));
+          $statusLabel = $late ? 'terlambat' : ($p->status === 'kembali' ? 'dikembalikan' : $p->status);
+          $statusText  = $late ? 'Terlambat' : ($p->status === 'kembali' ? 'Dikembalikan' : ucfirst(str_replace('_',' ',$p->status)));
         @endphp
         <tr>
           <td class="td-no">{{ $key + 1 }}</td>
