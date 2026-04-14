@@ -348,8 +348,8 @@ tbody td{padding:13px 15px;font-size:14px;color:var(--ink);vertical-align:middle
           @forelse($riwayat as $i => $r)
           <tr>
             <td class="td-muted">{{ $i + 1 }}</td>
-            <td class="td-bold">{{ $r->peminjaman->anggota->nama }}</td>
-            <td>{{ $r->peminjaman->buku->judul }}</td>
+            <td class="td-bold">{{ $r->peminjaman->anggota->name ?? 'Anggota tidak ditemukan' }}</td>
+<td>{{ $r->peminjaman->buku->judul ?? 'Buku tidak ditemukan' }}</td>
             <td class="td-muted">{{ \Carbon\Carbon::parse($r->tanggal_kembali_aktual)->format('d M Y') }}</td>
             <td>
               @if($r->hari_terlambat > 0)

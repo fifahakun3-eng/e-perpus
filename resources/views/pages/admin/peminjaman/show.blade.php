@@ -150,7 +150,7 @@ body { background:var(--paper); font-family:'DM Sans',sans-serif; color:var(--in
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         Anggota
       </div>
-      <div class="dc-val">{{ $peminjaman->anggota->nama }}</div>
+      <div class="dc-val">{{ $peminjaman->anggota->name ?? '-' }}</div>
       @if(isset($peminjaman->anggota->email))
         <div class="dc-sub">{{ $peminjaman->anggota->email }}</div>
       @endif
@@ -161,8 +161,8 @@ body { background:var(--paper); font-family:'DM Sans',sans-serif; color:var(--in
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5C4 18.12 5.12 17 6.5 17H20"/><path d="M6.5 2H20v20H6.5C5.12 22 4 20.88 4 19.5v-15C4 3.12 5.12 2 6.5 2z"/></svg>
         Buku
       </div>
-      <div class="dc-val">{{ $peminjaman->buku->judul }}</div>
-      <div class="dc-sub">Sisa stok: {{ $peminjaman->buku->stok }}</div>
+      <div class="dc-val">{{ $peminjaman->buku->judul ?? '-' }}</div>
+      <div class="dc-sub">Sisa stok: {{ $peminjaman->buku->stok ?? '-' }}</div>
     </div>
 
     <div class="detail-card full">

@@ -12,9 +12,13 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name',
+        'nis',
+        'kelas',
+        'no_telp',
+        'alamat',
+        'role',
         'email',
         'password',
-        'role',
     ];
 
     protected $hidden = [
@@ -28,5 +32,15 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isAnggota(): bool
+    {
+        return $this->role === 'anggota';
     }
 }

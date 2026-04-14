@@ -277,12 +277,12 @@ body { background:var(--paper); font-family:'DM Sans',sans-serif; color:var(--in
         </div>
         <div class="list-group list-anggota">
           @foreach($anggotas as $a)
-            <div class="list-group-item item-anggota" data-name="{{ strtolower($a->nama) }}">
+            <div class="list-group-item item-anggota" data-name="{{ strtolower($a->name) }}">
               <div class="info">
-                <div class="title">{{ $a->nama }}</div>
+                <div class="title">{{ $a->name }}</div>
                 <div class="sub">No. Telp: {{ $a->no_telp ?? '-' }}</div>
               </div>
-              <button type="button" class="btn-select" onclick="selectAnggota({{ $a->id }}, '{{ addslashes($a->nama) }}')" data-bs-dismiss="modal">Pilih</button>
+              <button type="button" class="btn-select" onclick="selectAnggota({{ $a->id }}, '{{ addslashes($a->name) }}')" data-bs-dismiss="modal">Pilih</button>
             </div>
           @endforeach
         </div>

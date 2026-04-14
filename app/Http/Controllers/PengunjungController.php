@@ -68,4 +68,13 @@ class PengunjungController extends Controller
         return redirect()->route('pengunjung.index')
             ->with('success', 'Data berhasil dihapus');
     }
+    public function searchUser(Request $request)
+    {
+        $query = $request->get('q', '');
+        $users = \App\Models\User::where('name', 'like', "%{$query}%")
+            ->select('id', 'name')
+            ->limit(10)
+            ->get();
+        return response()->json($users);
+    }
 }

@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
-use App\Models\Anggota;
+use Illuminate\Support\Facades\Hash;
 
 class AnggotaController extends Controller
 {
     public function index()
     {
-        $anggota = Anggota::all();
+        $anggota = User::all();
         return view('pages.admin.anggota.index', compact('anggota'));
     }
 
@@ -21,53 +22,90 @@ class AnggotaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required',
-            'nis' => 'required',
-            'kelas' => 'required',
-            'no_telp' => 'nullable',
-            'alamat' => 'required',
+            'name' => 'required|string|max:255',
+            'nis' => 'nullable|string|max:50|unique:users,nis',
+            'kelas' => 'nullable|string|max:50',
+            'no_telp' => 'nullable|string|max:20',
+            'alamat' => 'nullable|string',
+            'role' => 'required|in:admin,anggota',
         ]);
 
-        Anggota::create($request->all());
+        // Untuk anggota: username = name, password = NIS
+        // Untuk admin: password tetap pakai kolom password yg sudah ada
+        $password = $request->role === 'anggota'
+            ? Hash::make($request->nis)
+            : Hash::make('admin123');
+
+        // Email di-generate otomatis agar kolom tidak null (karena kolom email unique di tabel users)
+        $emailFallback = strtolower(str_replace(' ', '', $request->name))
+            . ($request->nis ?? rand(100, 999))
+            . '@eperpus.local';
+
+        User::create([
+            'name' => $request->name,
+            'nis' => $request->nis,
+            'kelas' => $request->kelas,
+            'no_telp' => $request->no_telp,
+            'alamat' => $request->alamat,
+            'email' => $emailFallback,
+            'password' => $password,
+            'role' => $request->role,
+        ]);
 
         return redirect()->route('anggota.index')
-            ->with('success', 'Data berhasil ditambahkan');
+            ->with('success', 'Data anggota berhasil ditambahkan');
     }
 
     public function edit($id)
     {
-        $anggota = Anggota::findOrFail($id);
+        $anggota = User::findOrFail($id);
         return view('pages.admin.anggota.edit', compact('anggota'));
     }
 
     public function update(Request $request, $id)
     {
+        $anggota = User::findOrFail($id);
+
         $request->validate([
-            'nama' => 'required',
-            'nis' => 'required',
-            'kelas' => 'required',
-            'no_telp' => 'nullable',
-            'alamat' => 'required',
+            'name' => 'required|string|max:255',
+            'nis' => 'nullable|string|max:50|unique:users,nis,' . $id,
+            'kelas' => 'nullable|string|max:50',
+            'no_telp' => 'nullable|string|max:20',
+            'alamat' => 'nullable|string',
+            'role' => 'required|in:admin,anggota',
         ]);
 
-        $anggota = Anggota::findOrFail($id);
-        $anggota->update($request->all());
+        $data = [
+            'name' => $request->name,
+            'nis' => $request->nis,
+            'kelas' => $request->kelas,
+            'no_telp' => $request->no_telp,
+            'alamat' => $request->alamat,
+            'role' => $request->role,
+        ];
+
+        // Reset password ke NIS baru jika NIS diubah
+        if ($request->filled('nis')) {
+            $data['password'] = Hash::make($request->nis);
+        }
+
+        $anggota->update($data);
 
         return redirect()->route('anggota.index')
-            ->with('success', 'Data berhasil diupdate');
+            ->with('success', 'Data anggota berhasil diupdate');
     }
 
     public function destroy($id)
     {
-        $anggota = Anggota::findOrFail($id);
-        $anggota->delete();
+        User::findOrFail($id)->delete();
 
         return redirect()->route('anggota.index')
-            ->with('success', 'Data berhasil dihapus');
+            ->with('success', 'Data anggota berhasil dihapus');
     }
+
     public function show($id)
-{
-    $anggota = Anggota::findOrFail($id);
-    return view('pages.admin.anggota.show', compact('anggota'));
-}
+    {
+        $anggota = User::findOrFail($id);
+        return view('pages.admin.anggota.show', compact('anggota'));
+    }
 }

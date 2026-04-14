@@ -20,8 +20,9 @@ class PengembalianController extends Controller
             ->get();
 
         $riwayat = Pengembalian::with(['peminjaman.anggota', 'peminjaman.buku'])
-            ->latest()
-            ->get();
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->filter(fn($r) => $r->peminjaman && $r->peminjaman->anggota && $r->peminjaman->buku);
 
         return view('pages.admin.pengembalian.index', compact('belumKembali', 'riwayat'));
     }
@@ -32,10 +33,10 @@ class PengembalianController extends Controller
     public function approve(Request $request)
     {
         $request->validate([
-            'peminjaman_id'          => 'required|exists:peminjaman,id',
+            'peminjaman_id' => 'required|exists:peminjaman,id',
             'tanggal_kembali_aktual' => 'required|date',
-            'kondisi_buku'           => 'required|in:baik,rusak_ringan,rusak_berat,hilang',
-            'catatan'                => 'nullable|string|max:500',
+            'kondisi_buku' => 'required|in:baik,rusak_ringan,rusak_berat,hilang',
+            'catatan' => 'nullable|string|max:500',
         ]);
 
         $peminjaman = Peminjaman::with('buku')->findOrFail($request->peminjaman_id);
@@ -44,9 +45,9 @@ class PengembalianController extends Controller
             return back()->with('error', 'Buku ini sudah dikembalikan sebelumnya.');
         }
 
-        $tanggalSeharusnya  = Carbon::parse($peminjaman->tanggal_kembali);
-        $tanggalAktual      = Carbon::parse($request->tanggal_kembali_aktual);
-        $dendaPerHari       = 1000;
+        $tanggalSeharusnya = Carbon::parse($peminjaman->tanggal_kembali);
+        $tanggalAktual = Carbon::parse($request->tanggal_kembali_aktual);
+        $dendaPerHari = 1000;
 
         $hariTerlambat = $tanggalAktual->gt($tanggalSeharusnya)
             ? $tanggalSeharusnya->diffInDays($tanggalAktual)
@@ -56,23 +57,23 @@ class PengembalianController extends Controller
 
         $dendaKondisi = match ($request->kondisi_buku) {
             'rusak_ringan' => 20000,
-            'rusak_berat'  => 50000,
-            'hilang'       => 100000,
-            default        => 0,
+            'rusak_berat' => 50000,
+            'hilang' => 100000,
+            default => 0,
         };
 
         $totalDenda = $dendaKeterlambatan + $dendaKondisi;
 
         Pengembalian::create([
-            'peminjaman_id'          => $peminjaman->id,
+            'peminjaman_id' => $peminjaman->id,
             'tanggal_kembali_aktual' => $tanggalAktual,
-            'hari_terlambat'         => $hariTerlambat,
-            'denda_keterlambatan'    => $dendaKeterlambatan,
-            'denda_kondisi'          => $dendaKondisi,
-            'total_denda'            => $totalDenda,
-            'kondisi_buku'           => $request->kondisi_buku,
-            'catatan'                => $request->catatan,
-            'status_bayar'           => $totalDenda > 0 ? 'belum_lunas' : 'lunas',
+            'hari_terlambat' => $hariTerlambat,
+            'denda_keterlambatan' => $dendaKeterlambatan,
+            'denda_kondisi' => $dendaKondisi,
+            'total_denda' => $totalDenda,
+            'kondisi_buku' => $request->kondisi_buku,
+            'catatan' => $request->catatan,
+            'status_bayar' => $totalDenda > 0 ? 'belum_lunas' : 'lunas',
         ]);
 
         $peminjaman->update(['status' => 'kembali']);

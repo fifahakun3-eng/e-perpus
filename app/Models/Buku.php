@@ -22,7 +22,9 @@ class Buku extends Model
         'rak',
         'stok',
         'deskripsi',
-        'cover'
+        'cover',
+        'tipe',
+        'url_ebook',
     ];
 
     // Relasi ke peminjaman

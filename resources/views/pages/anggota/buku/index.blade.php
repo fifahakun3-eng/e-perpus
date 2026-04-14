@@ -24,30 +24,11 @@
 .pm-header-left h1 { font-family:'Playfair Display',serif; font-size:28px; font-weight:700; color:var(--ink); }
 .pm-header-left p  { font-size:13px; color:var(--text-muted); margin-top:4px; font-weight:300; }
 
-.btn-add {
-  display:inline-flex; align-items:center; gap:8px;
-  padding:11px 22px; background:var(--ink); color:#fff;
-  font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500;
-  border-radius:9px; text-decoration:none;
-  transition:background .2s, transform .15s, box-shadow .2s;
-}
-.btn-add:hover { background:var(--amber); color:var(--ink); box-shadow:0 6px 20px rgba(200,134,10,.28); transform:translateY(-1px); }
-.btn-add svg { width:16px; height:16px; }
-
-.alert {
-  display:flex; align-items:center; gap:10px;
-  padding:13px 16px; border-radius:9px; font-size:14px; margin-bottom:20px;
-}
-.alert-success { background:var(--green-bg); color:var(--green); border:1px solid #b2e0c6; }
-.alert-error   { background:#fdecea; color:var(--red); border:1px solid #f5c0bb; }
-.alert svg { width:15px; height:15px; flex-shrink:0; }
-
-/* Filter card */
 .filter-card {
   background:#fff; border:1px solid var(--border); border-radius:12px;
   padding:16px 20px; margin-bottom:20px; box-shadow:0 1px 8px var(--shadow);
 }
-.filter-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr auto; gap:12px; align-items:end; }
+.filter-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr auto; gap:12px; align-items:end; }
 @media(max-width:768px){ .filter-grid{ grid-template-columns:1fr 1fr; } }
 
 .filter-label { font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); margin-bottom:6px; }
@@ -116,18 +97,26 @@ tbody td { padding:13px 16px; font-size:14px; color:var(--ink); vertical-align:m
   transition:background .15s, border-color .15s, color .15s;
 }
 .btn-icon:hover.view { background:#e8f0fb; border-color:#1a5fa8; color:#1a5fa8; }
-.btn-icon:hover.edit { background:var(--amber-bg); border-color:var(--amber); color:var(--amber); }
-.btn-icon:hover.del  { background:#fdecea; border-color:var(--red); color:var(--red); }
 .btn-icon svg { width:14px; height:14px; }
+
+.btn-pinjam {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:6px 14px; background:var(--ink); color:#fff;
+  border-radius:7px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500;
+  text-decoration:none; border:none; cursor:pointer;
+  transition:background .2s, transform .15s;
+}
+.btn-pinjam:hover { background:var(--amber); color:var(--ink); transform:translateY(-1px); }
+.btn-pinjam:disabled, .btn-pinjam.disabled {
+  background:var(--warm-gray); color:var(--text-muted); cursor:not-allowed; transform:none;
+}
+.btn-pinjam svg { width:13px; height:13px; }
 
 .table-footer {
   padding:14px 20px; border-top:1px solid var(--warm-gray);
   display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
 }
 .table-footer small { font-size:12px; color:var(--text-muted); }
-
-.badge-ebook { background:#ede9fe; color:#5b21b6; }
-.badge-fisik  { background:#e0f2fe; color:#0369a1; }
 
 .empty-state { padding:60px 20px; text-align:center; }
 .empty-state svg { width:48px; height:48px; color:var(--border); margin-bottom:12px; }
@@ -138,29 +127,10 @@ tbody td { padding:13px 16px; font-size:14px; color:var(--ink); vertical-align:m
 
   <div class="pm-header">
     <div class="pm-header-left">
-      <h1>Data Buku</h1>
-      <p>Kelola koleksi buku perpustakaan</p>
+      <h1>Daftar Buku</h1>
+      <p>Temukan dan pinjam koleksi buku perpustakaan</p>
     </div>
-    @if(auth()->user()->role === 'admin')
-      <a href="{{ route('buku.create') }}" class="btn-add">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Tambah Buku
-      </a>
-    @endif
   </div>
-
-  @if (session('success'))
-    <div class="alert alert-success">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-      {{ session('success') }}
-    </div>
-  @endif
-  @if (session('error'))
-    <div class="alert alert-error">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      {{ session('error') }}
-    </div>
-  @endif
 
   <!-- Filter -->
   <div class="filter-card">
@@ -169,14 +139,6 @@ tbody td { padding:13px 16px; font-size:14px; color:var(--ink); vertical-align:m
         <div>
           <div class="filter-label">Cari</div>
           <input type="text" name="search" class="filter-control" placeholder="Judul, penulis, ISBN..." value="{{ request('search') }}">
-        </div>
-        <div>
-          <div class="filter-label">Tipe</div>
-          <select name="tipe" class="filter-control">
-            <option value="">Semua</option>
-            <option value="fisik"  {{ request('tipe') == 'fisik'  ? 'selected' : '' }}>Buku Fisik</option>
-            <option value="ebook"  {{ request('tipe') == 'ebook'  ? 'selected' : '' }}>Ebook</option>
-          </select>
         </div>
         <div>
           <div class="filter-label">Kategori</div>
@@ -219,7 +181,6 @@ tbody td { padding:13px 16px; font-size:14px; color:var(--ink); vertical-align:m
         <tr>
           <th>No</th>
           <th>Buku</th>
-          <th>Tipe</th>
           <th>ISBN</th>
           <th>Kategori</th>
           <th>Tahun</th>
@@ -248,17 +209,6 @@ tbody td { padding:13px 16px; font-size:14px; color:var(--ink); vertical-align:m
               </div>
             </td>
             <td style="font-family:monospace; font-size:12px; color:var(--text-muted)">{{ $item->isbn ?? '—' }}</td>
-            <td>
-              @if(($item->tipe ?? 'fisik') === 'ebook')
-                <span class="badge badge-ebook">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="margin-right:4px"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>Ebook
-                </span>
-              @else
-                <span class="badge badge-fisik">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="margin-right:4px"><path d="M4 19.5C4 18.12 5.12 17 6.5 17H20"/><path d="M6.5 2H20v20H6.5C5.12 22 4 20.88 4 19.5v-15C4 3.12 5.12 2 6.5 2z"/></svg>Fisik
-                </span>
-              @endif
-            </td>
             <td><span class="badge badge-cat">{{ $item->kategori }}</span></td>
             <td style="color:var(--text-muted); font-size:13px;">{{ $item->tahun_terbit }}</td>
             <td><span class="badge badge-rak">{{ $item->rak }}</span></td>
@@ -276,23 +226,20 @@ tbody td { padding:13px 16px; font-size:14px; color:var(--ink); vertical-align:m
                 <a href="{{ route('buku.show', $item->id) }}" class="btn-icon view" title="Detail">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 </a>
-                @if(auth()->user()->role === 'admin')
-                  <a href="{{ route('buku.edit', $item->id) }}" class="btn-icon edit" title="Edit">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                @if($item->stok > 0)
+                  <a href="{{ route('peminjaman.create', ['buku_id' => $item->id]) }}" class="btn-pinjam">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 19.5C4 18.12 5.12 17 6.5 17H20"/><path d="M6.5 2H20v20H6.5C5.12 22 4 20.88 4 19.5v-15C4 3.12 5.12 2 6.5 2z"/></svg>
+                    Pinjam
                   </a>
-                  <form method="POST" action="{{ route('buku.destroy', $item->id) }}" style="display:inline" onsubmit="return confirm('Hapus buku ini?')">
-                    @csrf @method('DELETE')
-                    <button type="submit" class="btn-icon del" title="Hapus">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                    </button>
-                  </form>
+                @else
+                  <span class="btn-pinjam disabled">Habis</span>
                 @endif
               </div>
             </td>
           </tr>
         @empty
           <tr>
-            <td colspan="9">
+            <td colspan="8">
               <div class="empty-state">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M4 19.5C4 18.12 5.12 17 6.5 17H20"/><path d="M6.5 2H20v20H6.5C5.12 22 4 20.88 4 19.5v-15C4 3.12 5.12 2 6.5 2z"/></svg>
                 <p>Belum ada data buku.</p>

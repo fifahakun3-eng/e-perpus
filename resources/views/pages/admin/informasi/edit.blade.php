@@ -11,7 +11,7 @@
 }
 * { box-sizing:border-box; margin:0; padding:0; }
 
-.pm-wrap { max-width:680px; margin:48px auto; padding:0 24px 80px; }
+.pm-wrap { max-width:760px; margin:48px auto; padding:0 24px 80px; }
 
 .pm-header {
   display:flex; align-items:flex-end; justify-content:space-between;
@@ -51,7 +51,12 @@
 }
 .form-control:focus { border-color:var(--amber); box-shadow:0 0 0 3px rgba(200,134,10,.12); }
 .form-control.is-invalid { border-color:var(--red); }
+.form-hint { font-size:11.5px; color:var(--text-muted); }
 .invalid-feedback { font-size:12px; color:var(--red); }
+
+.img-preview { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.img-preview img { height:72px; border-radius:7px; border:1px solid var(--border); object-fit:cover; }
+.img-preview span { font-size:12px; color:var(--text-muted); }
 
 .form-actions { display:flex; gap:12px; margin-top:28px; padding-top:24px; border-top:1px solid var(--warm-gray); }
 
@@ -74,17 +79,17 @@
 }
 .btn-cancel:hover { border-color:var(--red); color:var(--red); }
 
-@media(max-width:480px){ .form-grid{ grid-template-columns:1fr; } }
+@media(max-width:560px){ .form-grid{ grid-template-columns:1fr; } }
 </style>
 
 <div class="pm-wrap">
 
   <div class="pm-header">
     <div class="pm-header-left">
-      <h1>Edit Pengunjung</h1>
-      <p>Perbarui data kunjungan</p>
+      <h1>Edit Informasi</h1>
+      <p>Perbarui informasi yang sudah ada</p>
     </div>
-    <a href="{{ route('pengunjung.index') }}" class="btn-back">
+    <a href="{{ route('informasi.index') }}" class="btn-back">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
       Kembali
     </a>
@@ -92,33 +97,59 @@
 
   <div class="form-card">
     <div class="form-card-body">
-      <form method="POST" action="{{ route('pengunjung.update', $pengunjung->id) }}">
+      <form method="POST" action="{{ route('informasi.update', $informasi->id) }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         <div class="form-grid">
 
-          <div class="form-group">
-            <label class="form-label">Nama Pengunjung <span>*</span></label>
-            <input type="text" name="nama"
-              class="form-control @error('nama') is-invalid @enderror"
-              value="{{ old('nama', $pengunjung->nama) }}" required>
-            @error('nama')<div class="invalid-feedback">{{ $message }}</div>@enderror
+          <div class="form-group full">
+            <label class="form-label">Judul <span>*</span></label>
+            <input type="text" name="judul"
+              class="form-control @error('judul') is-invalid @enderror"
+              value="{{ old('judul', $informasi->judul) }}" required>
+            @error('judul')<div class="invalid-feedback">{{ $message }}</div>@enderror
           </div>
 
           <div class="form-group">
-            <label class="form-label">Tanggal Kunjungan <span>*</span></label>
+            <label class="form-label">Kategori <span>*</span></label>
+            <select name="kategori" class="form-control @error('kategori') is-invalid @enderror" required>
+              <option value="">— Pilih Kategori —</option>
+              @foreach(['Pengumuman', 'Berita', 'Kegiatan', 'Lainnya'] as $k)
+                <option value="{{ $k }}" {{ old('kategori', $informasi->kategori) == $k ? 'selected' : '' }}>{{ $k }}</option>
+              @endforeach
+            </select>
+            @error('kategori')<div class="invalid-feedback">{{ $message }}</div>@enderror
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tanggal <span>*</span></label>
             <input type="date" name="tanggal"
               class="form-control @error('tanggal') is-invalid @enderror"
-              value="{{ old('tanggal', $pengunjung->tanggal) }}" required>
+              value="{{ old('tanggal', $informasi->tanggal->format('Y-m-d')) }}" required>
             @error('tanggal')<div class="invalid-feedback">{{ $message }}</div>@enderror
           </div>
 
           <div class="form-group full">
-            <label class="form-label">Keperluan <span>*</span></label>
-            <textarea name="keperluan" rows="3"
-              class="form-control @error('keperluan') is-invalid @enderror"
-              required>{{ old('keperluan', $pengunjung->keperluan) }}</textarea>
-            @error('keperluan')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            <label class="form-label">Isi Informasi <span>*</span></label>
+            <textarea name="isi" rows="6"
+              class="form-control @error('isi') is-invalid @enderror"
+              required>{{ old('isi', $informasi->isi) }}</textarea>
+            @error('isi')<div class="invalid-feedback">{{ $message }}</div>@enderror
+          </div>
+
+          <div class="form-group full">
+            <label class="form-label">Gambar</label>
+            @if($informasi->gambar)
+              <div class="img-preview">
+                <img src="{{ asset('storage/' . $informasi->gambar) }}" alt="Gambar saat ini">
+                <span>Gambar saat ini. Upload baru untuk mengganti.</span>
+              </div>
+            @endif
+            <input type="file" name="gambar"
+              class="form-control @error('gambar') is-invalid @enderror"
+              accept="image/jpeg,image/png,image/jpg">
+            <span class="form-hint">Format JPG/PNG, maks. 2MB. Kosongkan jika tidak ingin mengubah.</span>
+            @error('gambar')<div class="invalid-feedback">{{ $message }}</div>@enderror
           </div>
 
         </div>
@@ -126,9 +157,9 @@
         <div class="form-actions">
           <button type="submit" class="btn-submit">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Update
+            Simpan Perubahan
           </button>
-          <a href="{{ route('pengunjung.index') }}" class="btn-cancel">Batal</a>
+          <a href="{{ route('informasi.index') }}" class="btn-cancel">Batal</a>
         </div>
       </form>
     </div>

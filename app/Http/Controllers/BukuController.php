@@ -34,9 +34,13 @@ class BukuController extends Controller
             match ($request->stok) {
                 'tersedia' => $query->where('stok', '>', 5),
                 'terbatas' => $query->whereBetween('stok', [1, 5]),
-                'habis'    => $query->where('stok', 0),
-                default    => null,
+                'habis' => $query->where('stok', 0),
+                default => null,
             };
+        }
+
+        if ($request->filled('tipe')) {
+            $query->where('tipe', $request->tipe);
         }
 
         $buku = $query->latest()->paginate(10)->withQueryString();
@@ -52,18 +56,24 @@ class BukuController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'judul'          => 'required|string|max:255',
-            'penulis'        => 'required|string|max:255',
-            'penerbit'       => 'required|string|max:255',
-            'isbn'           => 'nullable|string|max:20|unique:bukus,isbn',
-            'tahun_terbit'   => 'required|integer|min:1900|max:' . date('Y'),
+            'judul' => 'required|string|max:255',
+            'penulis' => 'required|string|max:255',
+            'penerbit' => 'required|string|max:255',
+            'isbn' => 'nullable|string|max:20|unique:bukus,isbn',
+            'tahun_terbit' => 'required|integer|min:1900|max:' . date('Y'),
             'jumlah_halaman' => 'nullable|integer|min:1',
-            'kategori'       => 'required|in:Novel,Buku Pelajaran,Teknologi,Agama,Sejarah',
-            'rak'            => 'required|in:A1,A2,B1,B2,C1',
-            'stok'           => 'required|integer|min:0',
-            'deskripsi'      => 'nullable|string|max:2000',
-            'cover'          => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'kategori' => 'required|in:Novel,Buku Pelajaran,Teknologi,Agama,Sejarah',
+            'rak' => 'required|in:A1,A2,B1,B2,C1',
+            'tipe' => 'required|in:fisik,ebook',
+            'stok' => 'required_if:tipe,fisik|nullable|integer|min:0',
+            'deskripsi' => 'nullable|string|max:2000',
+            'cover' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'url_ebook' => 'nullable|url|max:500',
         ]);
+
+        if ($request->tipe === 'ebook') {
+            $validated['stok'] = 0;
+        }
 
         if ($request->hasFile('cover')) {
             $validated['cover'] = $request->file('cover')->store('covers', 'public');
@@ -94,18 +104,24 @@ class BukuController extends Controller
         $buku = Buku::findOrFail($id);
 
         $validated = $request->validate([
-            'judul'          => 'required|string|max:255',
-            'penulis'        => 'required|string|max:255',
-            'penerbit'       => 'required|string|max:255',
-            'isbn'           => 'nullable|string|max:20|unique:bukus,isbn,' . $id,
-            'tahun_terbit'   => 'required|integer|min:1900|max:' . date('Y'),
+            'judul' => 'required|string|max:255',
+            'penulis' => 'required|string|max:255',
+            'penerbit' => 'required|string|max:255',
+            'isbn' => 'nullable|string|max:20|unique:bukus,isbn,' . $id,
+            'tahun_terbit' => 'required|integer|min:1900|max:' . date('Y'),
             'jumlah_halaman' => 'nullable|integer|min:1',
-            'kategori'       => 'required|in:Novel,Buku Pelajaran,Teknologi,Agama,Sejarah',
-            'rak'            => 'required|in:A1,A2,B1,B2,C1',
-            'stok'           => 'required|integer|min:0',
-            'deskripsi'      => 'nullable|string|max:2000',
-            'cover'          => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'kategori' => 'required|in:Novel,Buku Pelajaran,Teknologi,Agama,Sejarah',
+            'rak' => 'required|in:A1,A2,B1,B2,C1',
+            'tipe' => 'required|in:fisik,ebook',
+            'stok' => 'required_if:tipe,fisik|nullable|integer|min:0',
+            'deskripsi' => 'nullable|string|max:2000',
+            'cover' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'url_ebook' => 'nullable|url|max:500',
         ]);
+
+        if ($request->tipe === 'ebook') {
+            $validated['stok'] = 0;
+        }
 
         if ($request->hasFile('cover')) {
             if ($buku->cover) {
