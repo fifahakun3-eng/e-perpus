@@ -21,6 +21,10 @@
 .btn-print-main{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:9px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;background:#fff;color:var(--ink);border:1px solid var(--border);transition:all .2s;text-decoration:none}
 .btn-print-main:hover{border-color:var(--amber);background:var(--amber-bg);color:var(--amber)}
 .btn-print-main svg{width:15px;height:15px}
+.btn-excel{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:9px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;background:#1e7e4a;color:#fff;border:1px solid #1e7e4a;transition:all .2s;text-decoration:none}
+.btn-excel:hover{background:#166038;border-color:#166038;color:#fff}
+.btn-excel svg{width:15px;height:15px}
+.header-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 
 /* ── Tab nav ── */
 .tab-nav{display:flex;gap:4px;margin-bottom:24px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:6px}
@@ -200,14 +204,25 @@ $tabLabels = ['anggota'=>'Anggota','pengunjung'=>'Pengunjung','peminjaman'=>'Pem
       <h1>Laporan Perpustakaan</h1>
       <p>Data anggota, pengunjung, peminjaman &amp; koleksi buku</p>
     </div>
-    <button onclick="window.print()" class="btn-print-main">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <polyline points="6 9 6 2 18 2 18 9"/>
-        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-        <rect x="6" y="14" width="12" height="8"/>
-      </svg>
-      Cetak / Simpan PDF
-    </button>
+    <div class="header-actions">
+      <button onclick="window.print()" class="btn-print-main">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <polyline points="6 9 6 2 18 2 18 9"/>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+          <rect x="6" y="14" width="12" height="8"/>
+        </svg>
+        Cetak / PDF
+      </button>
+      <a href="#" onclick="exportExcel(event)" class="btn-excel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="8" y1="13" x2="16" y2="13"/>
+          <line x1="8" y1="17" x2="16" y2="17"/>
+        </svg>
+        Export Excel
+      </a>
+    </div>
   </div>
 
   {{-- Tab Nav ── screen only --}}
@@ -594,7 +609,6 @@ $tabLabels = ['anggota'=>'Anggota','pengunjung'=>'Pengunjung','peminjaman'=>'Pem
 function switchTab(name) {
   const url = new URL(window.location.href);
   url.searchParams.set('tab', name);
-  // Hapus filter tab lain agar tidak bentrok
   window.location.href = url.toString();
 }
 
@@ -611,6 +625,27 @@ liveSearch('srAnggota',    'tblAnggota');
 liveSearch('srPengunjung', 'tblPengunjung');
 liveSearch('srPeminjaman', 'tblPeminjaman');
 liveSearch('srBuku',       'tblBuku');
+
+// Export Excel — ikuti filter & tab yang sedang aktif
+function exportExcel(e) {
+  e.preventDefault();
+  const params = new URLSearchParams(window.location.search);
+  const tab    = params.get('tab') || 'anggota';
+
+  const routeMap = {
+    anggota:    '{{ route("laporan.export.anggota") }}',
+    pengunjung: '{{ route("laporan.export.pengunjung") }}',
+    peminjaman: '{{ route("laporan.export.peminjaman") }}',
+    buku:       '{{ route("laporan.export.buku") }}',
+  };
+
+  const base = routeMap[tab];
+  if (!base) return;
+
+  // Teruskan semua query string filter ke URL export
+  const exportUrl = base + (params.toString() ? '?' + params.toString() : '');
+  window.location.href = exportUrl;
+}
 </script>
 
 @endsection

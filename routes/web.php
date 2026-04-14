@@ -106,4 +106,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/denda/{id}/bayar', [DendaController::class, 'bayar'])
         ->name('denda.bayar');
 
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::get('/laporan/export/anggota',    [LaporanController::class, 'exportAnggota'])->name('laporan.export.anggota');
+    Route::get('/laporan/export/pengunjung', [LaporanController::class, 'exportPengunjung'])->name('laporan.export.pengunjung');
+    Route::get('/laporan/export/peminjaman', [LaporanController::class, 'exportPeminjaman'])->name('laporan.export.peminjaman');
+    Route::get('/laporan/export/buku',       [LaporanController::class, 'exportBuku'])->name('laporan.export.buku');
 });

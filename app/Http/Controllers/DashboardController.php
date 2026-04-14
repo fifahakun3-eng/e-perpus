@@ -29,8 +29,8 @@ class DashboardController extends Controller
             ->count();
 
         // Tabel peminjaman terbaru
-        $peminjaman = Peminjaman::with(['anggota', 'buku'])
-            ->whereHas('anggota')
+        $peminjaman = Peminjaman::with(['user', 'buku'])
+            ->whereHas('user')
             ->whereHas('buku')
             ->latest()
             ->take(10)

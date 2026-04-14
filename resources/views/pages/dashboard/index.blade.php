@@ -142,7 +142,7 @@ $pengunjungBulanIni = Pengunjung::whereYear('tanggal',now()->year)->whereMonth('
 $pengunjungHariIni  = Pengunjung::whereDate('tanggal',now()->toDateString())->count();
 
 // Peminjaman terbaru
-$peminjamanTerbaru = Peminjaman::with(['anggota','buku'])->whereHas('anggota')->whereHas('buku')->latest()->take(6)->get();
+$peminjamanTerbaru = Peminjaman::with(['user','buku'])->whereHas('user')->whereHas('buku')->latest()->take(6)->get();
 
 // Buku stok hampir habis / habis
 $bukuKritis = Buku::where('stok','<=',3)->orderBy('stok')->take(5)->get();
@@ -158,7 +158,7 @@ for($i=5;$i>=0;$i--){
 }
 
 // Aktivitas terbaru (gabungan)
-$aktifitasPeminjaman = Peminjaman::with(['anggota','buku'])->whereHas('anggota')->whereHas('buku')->latest()->take(4)->get();
+$aktifitasPeminjaman = Peminjaman::with(['user','buku'])->whereHas('user')->whereHas('buku')->latest()->take(4)->get();
 @endphp
 
 <div class="db-wrap">

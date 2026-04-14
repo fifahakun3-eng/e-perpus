@@ -15,14 +15,14 @@ return new class extends Migration
             $table->id();
 
             // Relasi ke tabel anggota
-            $table->foreignId('anggota_id')
-                  ->constrained('anggota')
-                  ->onDelete('cascade');
+            $table->foreignId('user_id')
+                ->constrained('users')
+                ->onDelete('cascade');
 
             // Relasi ke tabel buku
             $table->foreignId('buku_id')
-                  ->constrained('bukus')
-                  ->onDelete('cascade');
+                ->constrained('bukus')
+                ->onDelete('cascade');
 
             // Tanggal peminjaman
             $table->date('tanggal_pinjam');
@@ -37,7 +37,7 @@ return new class extends Migration
 
             // Status transaksi
             $table->enum('status', ['dipinjam', 'kembali'])
-                  ->default('dipinjam');
+                ->default('dipinjam');
 
             $table->timestamps();
         });
